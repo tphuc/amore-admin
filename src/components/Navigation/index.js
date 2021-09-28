@@ -3,6 +3,7 @@ import {Block} from 'baseui/block';
 import {  MenuAdapter } from "baseui/list";
 import ChevronDown from 'baseui/icon/chevron-down';
 import ChevronRight from 'baseui/icon/chevron-right';
+import { useHistory } from 'react-router-dom';
 
 function NavItem({
     item = {
@@ -11,6 +12,7 @@ function NavItem({
     onChange = () => {},
 }) {
 
+    const history = useHistory()
     const [expand, setExpand] = useState(false);
 
     const handleClick = React.useCallback(() => {
@@ -20,17 +22,37 @@ function NavItem({
         }
         else {
             // if nav item
-            onChange({ item: item })
+            onChange(item)
         }
 
     }, [item, expand])
 
+    const isMatchPath = () => {
+        return history.location.pathname.includes(item.path)
+    }
+
     return <>
         <MenuAdapter
-            endEnhancer={() => item?.children?.length ? ( expand ? <ChevronDown size={24}  /> : <ChevronRight size={24}/> ) : null} onClick={handleClick} >
+            overrides={{
+                Root: {
+                    style:  ({ $theme }) => ({
+                        
+                        height: '52px',
+                        backgroundColor: isMatchPath() ? $theme.colors.mono900 : $theme.colors.background
+                      })
+                },
+                Content: {
+                    style: ({ $theme }) => ({
+                        color: isMatchPath() ? $theme.colors.white : $theme.colors.mono800
+                    })
+                }
+            }}
+            endEnhancer={() => item?.children?.length ? ( expand ? <ChevronDown size={24}  /> : <ChevronRight size={24}/> ) : null} 
+
+            onClick={handleClick} >
             {item.name}
         </MenuAdapter>
-        {expand && item.children?.map(data => <NavItem item={data} activeItemID={activeItemID} onChange={onChange} />)}
+        {expand && item.children?.map((data, id) => <NavItem key={id} item={data}  onChange={() => onChange(data)} />)}
     </>
 }
 

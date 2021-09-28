@@ -11,7 +11,7 @@ export default function App() {
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
         <BrowserRouter>
-            <Route exact path='/' component={Dashboard} />
+            <Route path='/dashboard' component={Dashboard} />
         </BrowserRouter>
       </BaseProvider>
     </StyletronProvider>

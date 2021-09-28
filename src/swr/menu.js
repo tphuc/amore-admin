@@ -8,11 +8,11 @@ const fetcher = (...args) => {
             name: "Quản lí chung",
             children: [
                 {
-                    name:'Danh muc',
+                    name:'Danh mục',
                     path:'/category'
                 },
                 {
-                    name:'Hang',
+                    name:'Nhãn hiệu',
                     path:'/brand'
                 }
             ]
@@ -21,7 +21,15 @@ const fetcher = (...args) => {
         {
             name:'San pham',
             path: '/products'
-        }
+        },
+        {
+            name: "Đơn đặt",
+            path: '/order'
+        },
+        {
+            name: "Người dùng",
+            path: '/user'
+        },
         
     ])
 }
