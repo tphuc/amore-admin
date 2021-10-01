@@ -15,24 +15,30 @@ import { Avatar } from 'baseui/avatar';
 
 
 
-const ActDelete = ({ fields = [], onConfirm = () => {} }) => {
+const ActDelete = ({ fields = [], onConfirm = () => { } }) => {
   const [_, theme] = useStyletron();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   return <>
     <Button onClick={() => setIsModalOpen(true)} kind='secondary' size='compact' shape='circle'><Delete size={24} color={theme.colors.mono800} /></Button>
     <Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
       <ModalHeader>Xóa</ModalHeader>
-      {/* <ModalBody>
-        <DynamicFields />
-      </ModalBody> */}
-      <ModalFooter>
-        <ModalButton shape='pill' onClick={onConfirm}>Xác nhận </ModalButton>
-      </ModalFooter>
+      <ModalBody>
+        <DynamicFields
+          onAction={async (state) => {
+
+            let result = await onConfirm(state)
+            if (result === true) {
+              setIsModalOpen(false)
+            }
+
+          }} fields={fields} />
+      </ModalBody>
+
     </Modal>
   </>
 }
 
-const ActEdit = ({ fields = [], onConfirm = () => {} }) => {
+const ActEdit = ({ fields = [], onConfirm = () => { } }) => {
   const [_, theme] = useStyletron();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   return <>
@@ -40,16 +46,19 @@ const ActEdit = ({ fields = [], onConfirm = () => {} }) => {
     <Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
       <ModalHeader>Chỉnh sửa</ModalHeader>
       <ModalBody>
-        <DynamicFields fields={fields} />
+        <DynamicFields
+          onAction={async (state) => {
+            let result = await onConfirm(state)
+            if (result === true) {
+              setIsModalOpen(false)
+            }
+          }} fields={fields} />
       </ModalBody>
-      <ModalFooter>
-        <ModalButton shape='pill' onClick={onConfirm}>Xác nhận </ModalButton>
-      </ModalFooter>
     </Modal>
   </>
 }
 
-const ActAdd = ({ fields = [], onConfirm = () => {}, ...props }) => {
+const ActAdd = ({ fields = [], onConfirm = () => { }, ...props }) => {
   const [_, theme] = useStyletron();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   return <>
@@ -57,11 +66,14 @@ const ActAdd = ({ fields = [], onConfirm = () => {}, ...props }) => {
     <Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
       <ModalHeader>Thêm</ModalHeader>
       <ModalBody>
-        <DynamicFields fields={fields} />
+        <DynamicFields
+          onAction={async (state) => {
+            let result = await onConfirm(state)
+            if (result === true) {
+              setIsModalOpen(false)
+            }
+          }} fields={fields} />
       </ModalBody>
-      <ModalFooter>
-        <ModalButton shape='pill' onClick={onConfirm}>Xác nhận </ModalButton>
-      </ModalFooter>
     </Modal>
   </>
 }

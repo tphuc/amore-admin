@@ -1,24 +1,22 @@
 import { Block } from 'baseui/block';
 import React from 'react';
 import StatefulTable, { ActAdd, ActDelete, ActEdit } from '../../../components/StatefulTable';
-import useCategories, { CategoriesCRUD } from '../../../framework/firebase/api/categories';
 import {
-  SnackbarProvider,
   useSnackbar,
-  DURATION,
 } from 'baseui/snackbar';
+import useBrands, { BrandsCRUD } from '../../../framework/firebase/api/brands';
 
 
 
 
-export default function Category() {
+export default function Brand() {
 
-  const { data: categories, mutate } = useCategories();
+  const { data: brands, mutate } = useBrands();
   const { enqueue } = useSnackbar()
 
   const onAdd = async (data) => {
     try {
-      let res = await CategoriesCRUD.create(data);
+      let res = await BrandsCRUD.create(data);
       enqueue({
         message: 'Thêm thành công!',
       })
@@ -33,7 +31,7 @@ export default function Category() {
 
   const onEdit = async (id, data) => {
     try {
-      let res = await CategoriesCRUD.update(id, data);
+      let res = await BrandsCRUD.update(id, data);
       enqueue({
         message: 'Sửa thành công!',
       })
@@ -49,7 +47,7 @@ export default function Category() {
 
   const onDelete = async (item) => {
     try {
-      let res = await CategoriesCRUD.delete(item.id);
+      let res = await BrandsCRUD.delete(item.id);
       enqueue({
         message: 'Xóa thành công!',
       })
@@ -64,17 +62,17 @@ export default function Category() {
   return <Block>
 
     <StatefulTable
-      title="Danh mục"
+      title="Nhãn hàng"
       actionText={<ActAdd
         onConfirm={onAdd}
         fields={[
           {
             id: "label",
             type: "text",
-            placeholder: 'Tên danh mục'
+            placeholder: 'Tên nhãn hàng'
           }
         ]} kind='primary' shape='pill' />}
-      data={categories || []}
+      data={brands || []}
       columns={['name']}
       mapRow={(item) => [
         item.label,
@@ -84,7 +82,7 @@ export default function Category() {
             {
               id:"label",
               type: "text",
-              placeholder: 'Tên danh mục',
+              placeholder: 'Tên nhãn hàng',
               defaultValue: item['label']
             }
           ]} onConfirm={(data) => onEdit(item.id, data)} />

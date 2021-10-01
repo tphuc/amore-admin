@@ -5,6 +5,9 @@ import {Plus, TriangleDown} from 'baseui/icon';
 import {StatefulMenu} from 'baseui/menu';
 import {Pagination} from 'baseui/pagination';
 import {StatefulPopover, PLACEMENT} from 'baseui/popover';
+import {
+  StatefulDataTable,
+} from 'baseui/data-table';
 import {Table} from 'baseui/table';
 
 

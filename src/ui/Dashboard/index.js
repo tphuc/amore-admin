@@ -6,6 +6,8 @@ import { useHistory,Route } from 'react-router-dom';
 import { Block } from 'baseui/block';
 import { useStyletron } from 'baseui';
 import Category from './Category';
+import Brand from './Brand';
+import Product from './Product';
 
 
 
@@ -24,6 +26,8 @@ export default function Dashboard(props) {
       </Block>
       <Block padding={'2%'} flex={1} backgroundColor={theme.colors.backgroundSecondary}>
         <Route path='/dashboard/category' component={Category}/>
+        <Route path='/dashboard/brand' component={Brand}/>
+        <Route path='/dashboard/product' component={Product}/>
       </Block>
     </Block>
   );

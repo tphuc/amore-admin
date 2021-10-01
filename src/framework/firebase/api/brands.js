@@ -1,0 +1,45 @@
+
+
+import useSWR from 'swr'
+
+import { firestore } from '..'
+import { doc, addDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query } from '@firebase/firestore'
+
+const ENDPOINT = 'brands'
+
+const fetcher = async (ENDPOINT) => {
+    let res = await getDocs(collection(firestore, ENDPOINT))
+    return res.docs.map(doc => ({ 
+        id: doc.id,
+        ...doc.data() 
+    }))
+}
+
+export default function useBrands() {
+    const { data, error, mutate } = useSWR(ENDPOINT, fetcher)
+    return {
+        mutate,
+        data: data,
+        isLoading: !error && !data,
+        isError: error
+    }
+}
+
+export const BrandsCRUD = {
+    create: async (data) => {
+        let res = await addDoc(collection(firestore, ENDPOINT), data)
+        return res
+    },
+    read: async(id) => {
+        let res = await getDoc(doc(firestore, ENDPOINT, id))
+        return res
+    },
+    update: async (id, data) => {
+        let res = await updateDoc(doc(firestore, ENDPOINT, id), data)
+        return res
+    },
+    delete: async (id) => {
+        let res = await deleteDoc(doc(firestore, ENDPOINT, id))
+        return res
+    },
+}

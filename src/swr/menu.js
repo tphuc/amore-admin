@@ -4,23 +4,18 @@ import useSWR from 'swr'
 
 const fetcher = (...args) => {
     return Promise.resolve([
+
         {
-            name: "Quản lí chung",
-            children: [
-                {
-                    name:'Danh mục',
-                    path:'/category'
-                },
-                {
-                    name:'Nhãn hiệu',
-                    path:'/brand'
-                }
-            ]
-            
+            name:'Danh mục',
+            path:'/category'
+        },
+        {
+            name:'Nhãn hiệu',
+            path:'/brand'
         },
         {
             name:'San pham',
-            path: '/products'
+            path: '/product'
         },
         {
             name: "Đơn đặt",
