@@ -1,7 +1,7 @@
 import { Client as Styletron } from 'styletron-engine-atomic';
 import { Provider as StyletronProvider } from 'styletron-react';
 import { LightTheme, BaseProvider } from 'baseui';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import Dashboard from './ui/Dashboard';
 import {
   SnackbarProvider,
@@ -14,14 +14,17 @@ export default function App() {
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
-     
-          <BrowserRouter>
+
+        <BrowserRouter>
           <SnackbarProvider>
-            <Route path='/dashboard' component={Dashboard} />
-            
-            </SnackbarProvider>
-          </BrowserRouter>
-        
+
+              <Redirect from='/' to={'/dashboard'} />
+              <Route path='/dashboard' component={Dashboard} />
+
+
+          </SnackbarProvider>
+        </BrowserRouter>
+
       </BaseProvider>
     </StyletronProvider>
   );
