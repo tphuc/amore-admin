@@ -9,6 +9,7 @@ import { useStyletron } from 'baseui';
 
 
 const getImageLabel = ({ option }) => {
+    console.log('option', option.name)
     return option && (
         <>
             <img alt={''} width='auto' height='200px' style={{objectFit:"scale-down", objectPosition:"center"}} 
@@ -96,7 +97,6 @@ export default function DynamicFields({
     const[_, theme] = useStyletron();
     const [data, setData] = React.useState({});
 
-    console.log(fields)
 
 
     React.useEffect(() => {
@@ -154,6 +154,7 @@ export default function DynamicFields({
             case 'file':
                 return <>
                     <FileUploader
+                        multiple={item.multiple}
                         onDropAccepted={(data) => setData(prev => ({ ...prev, [item.id]: item.defaultValue ? [...item.defaultValue, ...data] : data  }))}
                         {...item.props}
                     />
@@ -217,7 +218,7 @@ export default function DynamicFields({
                                 }
                             }
                         }}
-                        multi
+                        multi={item.multiple}
                         creatable
                         // deleteRemoves={true}
                         value={data[item.id]}

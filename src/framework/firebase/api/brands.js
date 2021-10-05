@@ -3,7 +3,7 @@
 import useSWR from 'swr'
 
 import { firestore } from '..'
-import { doc, addDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query } from '@firebase/firestore'
+import { doc, addDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, setDoc } from '@firebase/firestore'
 
 const ENDPOINT = 'brands'
 
@@ -28,6 +28,10 @@ export default function useBrands() {
 export const BrandsCRUD = {
     create: async (data) => {
         let res = await addDoc(collection(firestore, ENDPOINT), data)
+        return res
+    },
+    createWithId: async (id, data) => {
+        let res = await setDoc(doc(firestore, ENDPOINT, id), data)
         return res
     },
     read: async(id) => {

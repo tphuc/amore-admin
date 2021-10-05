@@ -8,6 +8,7 @@ import { useStyletron } from 'baseui';
 import Category from './Category';
 import Brand from './Brand';
 import Product from './Product';
+import Order from './Order';
 
 
 
@@ -28,6 +29,7 @@ export default function Dashboard(props) {
         <Route path='/dashboard/category' component={Category}/>
         <Route path='/dashboard/brand' component={Brand}/>
         <Route path='/dashboard/product' component={Product}/>
+        <Route path='/dashboard/order' component={Order}/>
       </Block>
     </Block>
   );

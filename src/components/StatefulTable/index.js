@@ -12,8 +12,30 @@ import {
 } from 'baseui/modal';
 import DynamicFields from '../DynamicFields'
 import { Avatar } from 'baseui/avatar';
+import { Tag } from 'baseui/tag'
 
 
+const CellWrap = (props) => {
+  return <div style={{display:"flex", flexDirection:"row", flexWrap:"wrap"}}>
+    {props.children}
+  </div>
+}
+ 
+const CellTag = (props) => {
+  const [_, theme] = useStyletron()
+  return <Tag 
+  closeable={false}
+  overrides={{
+    Text: {
+      style: () => ({
+        color: theme.colors.mono800
+      })
+    }
+  }}
+  color={theme.colors.mono200}
+  variant="solid"
+  kind="custom">{props.children}</Tag>
+}
 
 const ActDelete = ({ fields = [], onConfirm = () => { } }) => {
   const [_, theme] = useStyletron();
@@ -101,7 +123,7 @@ const ImagesList = ({ images = [] }) => {
             borderBottomLeftRadius: $theme.borders.radius100,
           }),
         },
-      }} src={item} />)}
+      }} src={item.name} />)}
   </div>
 }
 
@@ -134,5 +156,7 @@ export {
   ActDelete,
   ActEdit,
   ActAdd,
+  CellWrap,
+  CellTag,
   ImagesList
 }

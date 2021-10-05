@@ -5,7 +5,7 @@ import useSWR from 'swr'
 import { firestore } from '..'
 import { doc, addDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, setDoc } from '@firebase/firestore'
 
-const ENDPOINT = 'products'
+const ENDPOINT = 'orders'
 
 const fetcher = async (ENDPOINT) => {
     let res = await getDocs(collection(firestore, ENDPOINT))
@@ -15,13 +15,8 @@ const fetcher = async (ENDPOINT) => {
     }))
 }
 
-export default function useProducts() {
-    const { data, error, mutate } = useSWR(ENDPOINT, fetcher, {
-        revalidateOnReconnect:false,
-        revalidateOnFocus: false,
-        revalidateIfStale: false,
-        refreshWhenHidden:false
-    })
+export default function useOrders() {
+    const { data, error, mutate } = useSWR(ENDPOINT, fetcher)
     return {
         mutate,
         data: data,
@@ -30,7 +25,7 @@ export default function useProducts() {
     }
 }
 
-export const ProductsCRUD = {
+export const OrdersCRUD = {
     create: async (data) => {
         let res = await addDoc(collection(firestore, ENDPOINT), data)
         return res

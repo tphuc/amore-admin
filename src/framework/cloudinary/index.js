@@ -12,6 +12,7 @@ const CloudinaryAPI = {
 
       if (!(file instanceof File) ) {
         return file
+      
       }
       else {
         form.append("file", file);
@@ -19,7 +20,7 @@ const CloudinaryAPI = {
 
         let res = await axios.post(baseUrl, form)
 
-        return res.data.url
+        return { name: res.data.url}
       }
 
 

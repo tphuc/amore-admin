@@ -18,7 +18,7 @@ export default function App() {
           <BrowserRouter>
           <SnackbarProvider>
             <Route path='/dashboard' component={Dashboard} />
-            <Route path='/brand' component={Dashboard} />
+            
             </SnackbarProvider>
           </BrowserRouter>
         

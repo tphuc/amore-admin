@@ -1,6 +1,6 @@
 import { Block } from 'baseui/block';
 import React from 'react';
-import StatefulTable, { ActAdd, ActDelete, ActEdit, CellTag, CellWrap, ImagesList } from '../../../components/StatefulTable';
+import StatefulTable, { ActAdd, ActDelete, ActEdit, ImagesList } from '../../../components/StatefulTable';
 import {
   useSnackbar,
 } from 'baseui/snackbar';
@@ -9,34 +9,22 @@ import useProducts, { ProductsCRUD } from '../../../framework/firebase/api/produ
 
 import { CloudinaryAPI } from '../../../framework/cloudinary';
 import { Tag } from "baseui/tag";
-import { parseLabelPrice, toArray, toObject, urlToFile } from '../../../util';
-import useBrands from '../../../framework/firebase/api/brands';
-import useCategories from '../../../framework/firebase/api/categories';
-import { serverTimestamp } from '../../../framework/firebase';
+import { urlToFile } from '../../../util';
 
-export default function Product() {
+export default function Order() {
 
-  const { data: products, mutate } = useProducts();
-  const { data: brands} = useBrands();
-  const { data: categories} = useCategories();
+  const { data: brands, mutate } = useProducts();
   const { enqueue } = useSnackbar()
 
   const onAdd = async (data) => {
     try {
-
       let files = data.images
-      
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
-      let { images, brands, category, ...fields } = data;
-
+      let { images, ...fields } = data;
       let res = await ProductsCRUD.create({
         images: fileUrls,
-        ...fields,
-        brands: toObject(brands),
-        categories: toObject(categories),
-        price: parseLabelPrice(fields.variants[0].label).price,
-        timestamp: serverTimestamp()
-      })
+        ...fields
+      });
 
       enqueue({
         message: 'Thêm thành công!',
@@ -53,7 +41,7 @@ export default function Product() {
   const onEdit = async (id, data) => {
     try {
       let files = data.images
-      
+      console.log(files)
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
 
       let { images, ...fields } = data;
@@ -127,58 +115,21 @@ export default function Product() {
             },
           },
           {
-            id: "brands",
-            type: "select",
-            placeholder: 'thuộc hãng',
-            options: brands,
-            props: {
-              creatable: true,
-              labelKey: "label",
-              valueKey: "id"
-            },
-          },
-          {
-            id: "categories",
-            type: "select-multiple",
-            placeholder: 'thuộc danh mục',
-            options: categories,
-            props: {
-              creatable: true,
-              labelKey: "label",
-              valueKey: "id"
-            },
-          },
-          {
-            id: "variants",
-            type: "select-multiple",
-            placeholder: 'lựa chọn (dung tích-giá tiền)',
-            props: {
-              creatable: true,
-              labelKey: "label",
-              valueKey: "value"
-            },
-
-          },
-          {
             id: "images",
             type: "file",
-            multiple: true,
             placeholder: 'hình ảnh được upload',
             props: {
               creatable: true,
             },
           }
         ]} kind='primary' shape='pill' />}
-      data={products || []}
-      columns={['Tên', 'Xuất xứ', 'Giới tính', 'Phong cách', 'Nhãn hiệu', 'Danh mục', 'Lựa chọn',  'Hình ảnh', '_']}
+      data={brands || []}
+      columns={['Tên', 'Xuất xứ', 'Giới tính', 'Phong cách', 'Hình ảnh', '_']}
       mapRow={(item) => [
         item.label,
-        <CellWrap>{item.origin.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{item.gender.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{item.style.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{toArray(item.brands).map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{toArray(item.categories).map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{item.variants.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
+        <>{item.origin.map(item => <Tag closeable={false}>{item.label}</Tag>)}</>,
+        <>{item.gender.map(item => <Tag closeable={false}>{item.label}</Tag>)}</>,
+        <>{item.style.map(item => <Tag closeable={false}>{item.label}</Tag>)}</>,
         <ImagesList images={item.images} />,
         <>
           <ActDelete onConfirm={() => onDelete(item)} />
@@ -217,51 +168,16 @@ export default function Product() {
               defaultValue: item['style']
             },
             {
-              id: "brands",
-              type: "select",
-              placeholder: 'thuộc hãng',
-              options: brands,
-              props: {
-                creatable: true,
-                labelKey: "label",
-                valueKey: "id"
-              },
-              defaultValue: toArray(item['brands'])
-            },
-            {
-              id: "categories",
-              type: "select-multiple",
-              placeholder: 'thuộc danh mục',
-              options: categories,
-              props: {
-                creatable: true,
-                labelKey: "label",
-                valueKey: "id"
-              },
-              defaultValue: toArray(item['categories'])
-            },
-            {
-              id: "variants",
-              type: "select-multiple",
-              placeholder: 'lựa chọn (dung tích-giá tiền)',
-              props: {
-                creatable: true,
-                labelKey: "label",
-                valueKey: "value"
-              },
-              defaultValue: item['variants']
-  
-            },
-            {
               id: "images",
               type: "file",
-              multiple: true,
               placeholder: 'hình ảnh được upload',
               props: {
                 creatable: true,
+                // labelKey: 'name',
                 valueKey: 'name'
               },
-              defaultValue: item.images
+              defaultValue: item.images?.map(item => ({ name: item }))
+              // Promise.all(item['images'].map(async item => urlToFile(item, item)))
             }
           ]} onConfirm={(data) => onEdit(item.id, data)} />
         </>
