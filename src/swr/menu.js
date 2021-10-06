@@ -1,25 +1,31 @@
 
 
 import useSWR from 'swr'
+import {AiOutlineAppstore, AiOutlineCrown, AiOutlineContainer, AiOutlineDatabase} from 'react-icons/ai'
 
 const fetcher = (...args) => {
     return Promise.resolve([
 
         {
             name:'Danh mục',
+            icon: AiOutlineAppstore,
             path:'/category'
         },
         {
+            icon: AiOutlineCrown,
             name:'Nhãn hiệu',
             path:'/brand'
         },
         {
-            name:'San pham',
+            icon: AiOutlineDatabase,
+            name:'Sản phẩm',
             path: '/product'
         },
         {
+
+            icon: AiOutlineContainer,
             name: "Đơn đặt",
-            path: '/order'
+            path: '/orders'
         },
         {
             name: "Người dùng",

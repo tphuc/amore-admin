@@ -1,6 +1,6 @@
 import { Block } from 'baseui/block';
 import React from 'react';
-import StatefulTable, { ActAdd, ActDelete, ActEdit, ImagesList } from '../../../components/StatefulTable';
+import StatefulTable, { ActAdd, ActConfirm, ActDelete, ActEdit, ImagesList } from '../../../components/StatefulTable';
 import {
   useSnackbar,
 } from 'baseui/snackbar';
@@ -9,11 +9,14 @@ import useProducts, { ProductsCRUD } from '../../../framework/firebase/api/produ
 
 import { CloudinaryAPI } from '../../../framework/cloudinary';
 import { Tag } from "baseui/tag";
-import { urlToFile } from '../../../util';
+import { formatNumber, urlToFile } from '../../../util';
+import useOrders, { OrdersCRUD } from '../../../framework/firebase/api/order';
+import { Checkbox } from 'baseui/checkbox'
 
 export default function Order() {
 
-  const { data: brands, mutate } = useProducts();
+  const { data: orders, mutate } = useOrders();
+  console.log(orders)
   const { enqueue } = useSnackbar()
 
   const onAdd = async (data) => {
@@ -64,7 +67,7 @@ export default function Order() {
 
   const onDelete = async (item) => {
     try {
-      let res = await ProductsCRUD.delete(item.id);
+      let res = await OrdersCRUD.delete(item.id);
       enqueue({
         message: 'Xóa thành công!',
       })
@@ -79,107 +82,24 @@ export default function Order() {
   return <Block>
 
     <StatefulTable
-      title="Sản phẩm"
-      actionText={<ActAdd
-        onConfirm={onAdd}
-        fields={[
-          {
-            id: "label",
-            type: "text",
-            placeholder: 'Tên sản phẩm'
-          },
-          {
-            id: "origin",
-            type: "select",
-            placeholder: 'xuất xứ',
-            props: {
-              creatable: true
-            }
-          },
-          {
-            id: "gender",
-            type: "select-multiple",
-            placeholder: 'giới tính',
-            props: {
-              creatable: true
-            }
-          },
-          {
-            id: "style",
-            type: "select-multiple",
-            placeholder: 'phong cách',
-            props: {
-              creatable: true,
-              labelKey: "label",
-              valueKey: "value"
-            },
-          },
-          {
-            id: "images",
-            type: "file",
-            placeholder: 'hình ảnh được upload',
-            props: {
-              creatable: true,
-            },
-          }
-        ]} kind='primary' shape='pill' />}
-      data={brands || []}
-      columns={['Tên', 'Xuất xứ', 'Giới tính', 'Phong cách', 'Hình ảnh', '_']}
+      title="Đơn đặt"
+      actionText={null}
+      data={orders || []}
+      columns={['Thông tin người đặt',  'Phương thức', 'Ngày đặt', 'Đã thanh toán', 'Tổng', '_']}
       mapRow={(item) => [
-        item.label,
-        <>{item.origin.map(item => <Tag closeable={false}>{item.label}</Tag>)}</>,
-        <>{item.gender.map(item => <Tag closeable={false}>{item.label}</Tag>)}</>,
-        <>{item.style.map(item => <Tag closeable={false}>{item.label}</Tag>)}</>,
-        <ImagesList images={item.images} />,
+        <div>
+        <span>{item.name}</span><br/>
+        <span>{item.phone}</span><br/>
+        <span>{item.address}</span>
+        </div>,
+        
+        <p>{item.paymentMethod === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}</p>,
+        <p>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</p>,
+        <Checkbox checked={item.paid}></Checkbox>,
+        <p>{formatNumber(item.total)}</p>,
         <>
           <ActDelete onConfirm={() => onDelete(item)} />
-          <ActEdit fields={[
-            {
-              id: "label",
-              type: "text",
-              placeholder: 'Tên sản phẩm',
-              defaultValue: item['label']
-            },
-            {
-              id: "origin",
-              type: "select",
-              placeholder: 'xuất xứ',
-              props: {
-                creatable: true
-              },
-              defaultValue: item['origin']
-            },
-            {
-              id: "gender",
-              type: "select-multiple",
-              placeholder: 'giới tính',
-              props: {
-                creatable: true
-              },
-              defaultValue: item['gender']
-            },
-            {
-              id: "style",
-              type: "select-multiple",
-              placeholder: 'phong cách',
-              props: {
-                creatable: true
-              },
-              defaultValue: item['style']
-            },
-            {
-              id: "images",
-              type: "file",
-              placeholder: 'hình ảnh được upload',
-              props: {
-                creatable: true,
-                // labelKey: 'name',
-                valueKey: 'name'
-              },
-              defaultValue: item.images?.map(item => ({ name: item }))
-              // Promise.all(item['images'].map(async item => urlToFile(item, item)))
-            }
-          ]} onConfirm={(data) => onEdit(item.id, data)} />
+          <ActConfirm header='Xác nhận đã thanh toán' onConfirm={(data) => onEdit(item.id, data)} />
         </>
       ]}
     />

@@ -27,7 +27,7 @@ export default function Product() {
       let files = data.images
       
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
-      let { images, brands, category, ...fields } = data;
+      let { images, brands, categories, ...fields } = data;
 
       let res = await ProductsCRUD.create({
         images: fileUrls,
@@ -56,10 +56,15 @@ export default function Product() {
       
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
 
-      let { images, ...fields } = data;
+      let { images, brands, categories, ...fields } = data;
+
+      
       let res = await ProductsCRUD.update(id, {
         images: fileUrls,
-        ...fields
+        ...fields,
+        brands: toObject(brands),
+        categories: toObject(categories),
+       
       });
       enqueue({
         message: 'Sửa thành công!',

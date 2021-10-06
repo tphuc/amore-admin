@@ -1,6 +1,6 @@
 import { useStyletron } from 'baseui'
 import { Button } from 'baseui/button'
-import { Delete, DeleteAlt, Overflow, Show } from 'baseui/icon'
+import { Check, Delete, DeleteAlt, Overflow, Show } from 'baseui/icon'
 import React from 'react'
 import PaginatedTable from '../PaginatedTable'
 import {
@@ -67,6 +67,27 @@ const ActEdit = ({ fields = [], onConfirm = () => { } }) => {
     <Button onClick={() => setIsModalOpen(true)} kind='secondary' size='compact' shape='circle'><Overflow size={24} color={theme.colors.mono800} /></Button>
     <Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
       <ModalHeader>Chỉnh sửa</ModalHeader>
+      <ModalBody>
+        <DynamicFields
+          onAction={async (state) => {
+            let result = await onConfirm(state)
+            if (result === true) {
+              setIsModalOpen(false)
+            }
+          }} fields={fields} />
+      </ModalBody>
+    </Modal>
+  </>
+}
+
+
+const ActConfirm = ({ fields = [], header, onConfirm = () => { } }) => {
+  const [_, theme] = useStyletron();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  return <>
+    <Button onClick={() => setIsModalOpen(true)} kind='secondary' size='compact' shape='circle'><Check size={24} color={theme.colors.mono800} /></Button>
+    <Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
+      <ModalHeader>{header}</ModalHeader>
       <ModalBody>
         <DynamicFields
           onAction={async (state) => {
@@ -156,6 +177,7 @@ export {
   ActDelete,
   ActEdit,
   ActAdd,
+  ActConfirm,
   CellWrap,
   CellTag,
   ImagesList

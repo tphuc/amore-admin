@@ -18,6 +18,10 @@ function toObject(array){
     return obj
 }
 
+const formatNumber = (number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number)
+}
+
 function toArray(array){
     return Object.values(array)
 }
@@ -35,5 +39,6 @@ export {
     urlToFile,
     toObject,
     toArray,
-    parseLabelPrice
+    parseLabelPrice,
+    formatNumber,
 }

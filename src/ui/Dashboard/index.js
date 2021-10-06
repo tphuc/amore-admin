@@ -29,7 +29,7 @@ export default function Dashboard(props) {
         <Route path='/dashboard/category' component={Category}/>
         <Route path='/dashboard/brand' component={Brand}/>
         <Route path='/dashboard/product' component={Product}/>
-        <Route path='/dashboard/order' component={Order}/>
+        <Route path='/dashboard/orders' component={Order}/>
       </Block>
     </Block>
   );

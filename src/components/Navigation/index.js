@@ -33,6 +33,7 @@ function NavItem({
 
     return <>
         <MenuAdapter
+            artwork={item.icon}
             overrides={{
                 Root: {
                     style: ({ $theme }) => ({
