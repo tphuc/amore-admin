@@ -1,6 +1,6 @@
 import { Block } from 'baseui/block';
 import React from 'react';
-import StatefulTable, { ActAdd, ActDelete, ActEdit, CellTag, CellWrap, ImagesList } from '../../../components/StatefulTable';
+import StatefulTable, { ActAdd, ActCustom, ActDelete, ActEdit, CellTag, CellWrap, ImagesList } from '../../../components/StatefulTable';
 import {
   useSnackbar,
 } from 'baseui/snackbar';
@@ -13,9 +13,12 @@ import { parseLabelPrice, toArray, toObject, urlToFile } from '../../../util';
 import useBrands from '../../../framework/firebase/api/brands';
 import useCategories from '../../../framework/firebase/api/categories';
 import { serverTimestamp } from '../../../framework/firebase';
+import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
+import { useStyletron } from 'baseui';
 
 export default function Product() {
 
+  const [css, theme] = useStyletron()
   const { data: products, mutate } = useProducts();
   const { data: brands} = useBrands();
   const { data: categories} = useCategories();
@@ -52,12 +55,20 @@ export default function Product() {
 
   const onEdit = async (id, data) => {
     try {
+      console.log(58, data)
       let files = data.images
       
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
 
       let { images, brands, categories, ...fields } = data;
 
+      console.log(65, id, {
+        images: fileUrls,
+        ...fields,
+        brands: toObject(brands),
+        categories: toObject(categories),
+       
+      })
       
       let res = await ProductsCRUD.update(id, {
         images: fileUrls,
@@ -65,6 +76,25 @@ export default function Product() {
         brands: toObject(brands),
         categories: toObject(categories),
        
+      });
+      enqueue({
+        message: 'Sửa thành công!',
+      })
+      mutate()
+      return true
+    }
+    catch (e) {
+      console.log(e)
+    }
+
+
+  }
+
+  const editProductHighlight = async (id, data) => {
+    console.log(data)
+    try {
+      let res = await ProductsCRUD.update(id, {
+          hightlight: data
       });
       enqueue({
         message: 'Sửa thành công!',
@@ -172,6 +202,10 @@ export default function Product() {
             props: {
               creatable: true,
             },
+          },
+          {
+            id: "introduction",
+            type: "richtext",
           }
         ]} kind='primary' shape='pill' />}
       data={products || []}
@@ -267,8 +301,14 @@ export default function Product() {
                 valueKey: 'name'
               },
               defaultValue: item.images
+            },
+            {
+              id: "introduction",
+              type: "richtext",
+              defaultValue: item['introduction'] || ''
             }
           ]} onConfirm={(data) => onEdit(item.id, data)} />
+          <ActCustom header='Lên trang chính' onClick={() => editProductHighlight(item.id, !item?.hightlight)} icon={<AiFillStar color={item?.hightlight ? theme.colors.accent500 : theme.colors.mono500}/>}/>
         </>
       ]}
     />

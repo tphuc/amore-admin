@@ -5,11 +5,11 @@ import { FileUploader } from "baseui/file-uploader";
 import React from 'react';
 import { Button } from 'baseui/button';
 import { useStyletron } from 'baseui';
+import JoditEditor from 'jodit-react';
 
 
 
 const getImageLabel = ({ option }) => {
-    console.log('option', option.name)
     return option && (
         <>
             <img alt={''} width='auto' height='200px' style={{objectFit:"scale-down", objectPosition:"center"}} 
@@ -97,7 +97,7 @@ export default function DynamicFields({
     const[_, theme] = useStyletron();
     const [data, setData] = React.useState({});
 
-
+    const [loading, setLoading] = React.useState(false);
 
     React.useEffect(() => {
         fields?.map((item) => {
@@ -113,7 +113,7 @@ export default function DynamicFields({
           
             setData(prev => ({
                 ...prev,
-                [item.id]: item.defaultValue
+                [item.id]:  item.defaultValue ? item.defaultValue : null
             }))
         })
     }, [])
@@ -130,7 +130,12 @@ export default function DynamicFields({
                 return <Input
                     placeholder={item.placeholder}
                     value={data[item.id]}
-                    onChange={(e) => setData({ ...data, [item.id]: e.target.value })}
+                    onChange={(e) => setData(prev => ({ ...prev, [item.id]: e.target.value }))}
+                />
+            case 'richtext':
+                return <JoditEditor
+                    value={data[item.id]}
+                    onBlur={(val) => setData(prev => ({ ...prev, [item.id]: val }))}
                 />
             case 'select':
                 return <Select
@@ -245,8 +250,11 @@ export default function DynamicFields({
         }
 
         <Block height={'10px'} />
-        <Button onClick={() => {
-            onAction(data)
+        <Button isLoading={loading} onClick={async () => {
+            setLoading(true)
+            await onAction(data)
+            setLoading(false)
+
         }}>{actionText}</Button>
     </Block>
 }

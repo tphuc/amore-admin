@@ -101,6 +101,34 @@ const ActConfirm = ({ fields = [], header, onConfirm = () => { } }) => {
   </>
 }
 
+
+const ActCustom = ({ fields = [], header, icon, onClick = null, onConfirm = () => { } }) => {
+  const [_, theme] = useStyletron();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  return <>
+    <Button onClick={() => {
+      if(onClick)
+        onClick()
+      else
+        setIsModalOpen(true)
+      
+     
+    }} kind='secondary' size='compact' shape='circle'>{icon}</Button>
+    <Modal onClose={() => setIsModalOpen(false)} isOpen={isModalOpen}>
+      <ModalHeader>{header}</ModalHeader>
+      <ModalBody>
+        <DynamicFields
+          onAction={async (state) => {
+            let result = await onConfirm(state)
+            if (result === true) {
+              setIsModalOpen(false)
+            }
+          }} fields={fields} />
+      </ModalBody>
+    </Modal>
+  </>
+}
+
 const ActAdd = ({ fields = [], onConfirm = () => { }, ...props }) => {
   const [_, theme] = useStyletron();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -120,6 +148,8 @@ const ActAdd = ({ fields = [], onConfirm = () => { }, ...props }) => {
     </Modal>
   </>
 }
+
+
 
 
 
@@ -178,7 +208,9 @@ export {
   ActEdit,
   ActAdd,
   ActConfirm,
+  ActCustom,
   CellWrap,
   CellTag,
-  ImagesList
+  ImagesList,
+
 }
