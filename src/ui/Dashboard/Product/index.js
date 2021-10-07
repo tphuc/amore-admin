@@ -62,14 +62,6 @@ export default function Product() {
 
       let { images, brands, categories, ...fields } = data;
 
-      console.log(65, id, {
-        images: fileUrls,
-        ...fields,
-        brands: toObject(brands),
-        categories: toObject(categories),
-       
-      })
-      
       let res = await ProductsCRUD.update(id, {
         images: fileUrls,
         ...fields,
@@ -140,7 +132,9 @@ export default function Product() {
             type: "select",
             placeholder: 'xuất xứ',
             props: {
-              creatable: true
+              creatable: true,
+              labelKey: "label",
+              valueKey: "value"
             }
           },
           {
@@ -148,7 +142,9 @@ export default function Product() {
             type: "select-multiple",
             placeholder: 'giới tính',
             props: {
-              creatable: true
+              creatable: true,
+              labelKey: "label",
+              valueKey: "value"
             }
           },
           {

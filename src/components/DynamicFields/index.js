@@ -113,7 +113,7 @@ export default function DynamicFields({
           
             setData(prev => ({
                 ...prev,
-                [item.id]:  item.defaultValue ? item.defaultValue : null
+                [item.id]:  item.defaultValue
             }))
         })
     }, [])
@@ -134,7 +134,7 @@ export default function DynamicFields({
                 />
             case 'richtext':
                 return <JoditEditor
-                    value={data[item.id]}
+                    value={data[item.id] || ''}
                     onBlur={(val) => setData(prev => ({ ...prev, [item.id]: val }))}
                 />
             case 'select':
@@ -160,7 +160,7 @@ export default function DynamicFields({
                 return <>
                     <FileUploader
                         multiple={item.multiple}
-                        onDropAccepted={(data) => setData(prev => ({ ...prev, [item.id]: item.defaultValue ? [...item.defaultValue, ...data] : data  }))}
+                        onDropAccepted={(data) => setData(prev => ({ ...prev, [item.id]: item.multiple ? [...item.defaultValue, ...data] : data  }))}
                         {...item.props}
                     />
                     <Block height={'5px'}/>
@@ -228,7 +228,7 @@ export default function DynamicFields({
                         // deleteRemoves={true}
                         value={data[item.id]}
                         onChange={({ value }) => {
-
+                            console.log(value)
                              setData(prev => ({ ...prev, [item.id]: value })) 
                         }}
                         options={item.options || []}
