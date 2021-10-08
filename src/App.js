@@ -9,14 +9,14 @@ import {
 import Login from './ui/Login';
 
 import PrivateRoute from './components/PrivateRoute';
-import { getAuth } from '@firebase/auth';
+import { auth } from './framework/firebase';
 
 
 const engine = new Styletron();
 
 
 export default function App() {
-  console.log(getAuth().currentUser)
+  console.log('app', auth, auth.currentUser)
 
   return (
     <StyletronProvider value={engine}>
@@ -24,9 +24,8 @@ export default function App() {
         <SnackbarProvider>
           <BrowserRouter>
             <Switch>
-              
               <PrivateRoute path='/dashboard' component={Dashboard} />
-              <Route exact path='/login' component={Login} />
+              <Route exact path='/' component={Login} />
             </Switch>
 
           </BrowserRouter>

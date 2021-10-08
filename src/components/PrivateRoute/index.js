@@ -9,7 +9,7 @@ import { auth } from '../../framework/firebase';
 
 
 function PrivateRoute({ component: Component, ...others }) {
-    console.log('private route', auth.currentUser)
+    console.log('private route', auth.app, auth.currentUser)
   return (
     <Route
       {...others}
@@ -18,7 +18,7 @@ function PrivateRoute({ component: Component, ...others }) {
       ) : (
         <Redirect
           to={{
-            pathname: '/login',
+            pathname: '/',
             state: { from: props.location },
           }}
         />
