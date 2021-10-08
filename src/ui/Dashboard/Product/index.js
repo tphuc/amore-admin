@@ -31,7 +31,14 @@ export default function Product() {
       
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
       let { images, brands, categories, ...fields } = data;
-
+      console.log({
+        images: fileUrls,
+        ...fields,
+        brands: toObject(brands),
+        categories: toObject(categories),
+        price: parseLabelPrice(fields.variants[0].label).price,
+        timestamp: serverTimestamp()
+      })
       let res = await ProductsCRUD.create({
         images: fileUrls,
         ...fields,
@@ -202,6 +209,7 @@ export default function Product() {
           {
             id: "introduction",
             type: "richtext",
+            defaultValue: ''
           }
         ]} kind='primary' shape='pill' />}
       data={products || []}

@@ -6,24 +6,31 @@ import Dashboard from './ui/Dashboard';
 import {
   SnackbarProvider,
 } from 'baseui/snackbar';
+import Login from './ui/Login';
+
+import PrivateRoute from './components/PrivateRoute';
+import { getAuth } from '@firebase/auth';
+
 
 const engine = new Styletron();
 
 
 export default function App() {
+  console.log(getAuth().currentUser)
+
   return (
     <StyletronProvider value={engine}>
       <BaseProvider theme={LightTheme}>
+        <SnackbarProvider>
+          <BrowserRouter>
+            <Switch>
+              
+              <PrivateRoute path='/dashboard' component={Dashboard} />
+              <Route exact path='/login' component={Login} />
+            </Switch>
 
-        <BrowserRouter>
-          <SnackbarProvider>
-
-              <Redirect from='/' to={'/dashboard'} />
-              <Route path='/dashboard' component={Dashboard} />
-
-
-          </SnackbarProvider>
-        </BrowserRouter>
+          </BrowserRouter>
+        </SnackbarProvider>
 
       </BaseProvider>
     </StyletronProvider>
