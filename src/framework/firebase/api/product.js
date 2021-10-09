@@ -3,12 +3,13 @@
 import useSWR from 'swr'
 
 import { firestore } from '..'
-import { doc, addDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, setDoc } from '@firebase/firestore'
+import { doc, addDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, setDoc, where, orderBy } from '@firebase/firestore'
+import React from 'react'
 
 const ENDPOINT = 'products'
 
 const fetcher = async (ENDPOINT) => {
-    let res = await getDocs(collection(firestore, ENDPOINT))
+    let res = await getDocs(collection(firestore, ENDPOINT), orderBy('timestamp', 'desc'))
     return res.docs.map(doc => ({ 
         id: doc.id,
         ...doc.data() 
@@ -22,7 +23,25 @@ export default function useProducts() {
         revalidateIfStale: false,
         refreshWhenHidden:false
     })
+
+
+
+    const fetchFilter = React.useCallback(async (queryOptions) => {
+
+        const q = query(collection(firestore, ENDPOINT), ...queryOptions);
+        let res = await getDocs(q)
+        
+        let data = res.docs.map(doc => ({ 
+            id: doc.id,
+            ...doc.data() 
+        }))
+
+        return data
+
+    }, [])
+
     return {
+        fetchFilter,
         mutate,
         data: data,
         isLoading: !error && !data,

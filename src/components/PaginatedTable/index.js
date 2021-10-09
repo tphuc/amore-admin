@@ -76,7 +76,7 @@ export default function PaginatedTable({
         </Button> */}
         {actionText}
       </div>
-      <div className={css({height: '500px'})}>
+      <div className={css({height: '800px'})}>
         <Table columns={columns} data={window()} />
       </div>
       <div

@@ -15,11 +15,13 @@ import useCategories from '../../../framework/firebase/api/categories';
 import { serverTimestamp } from '../../../framework/firebase';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { useStyletron } from 'baseui';
+import SearchBar from '../../../components/SearchBar';
+import { where, orderBy } from 'firebase/firestore';
 
 export default function Product() {
 
   const [css, theme] = useStyletron()
-  const { data: products, mutate } = useProducts();
+  const { data: products, mutate, fetchFilter } = useProducts();
   const { data: brands} = useBrands();
   const { data: categories} = useCategories();
   const { enqueue } = useSnackbar()
@@ -123,6 +125,49 @@ export default function Product() {
   }
 
   return <Block>
+    <SearchBar 
+    onSearch={async (data) => {
+      let queries = [];
+      if(data.label){
+        queries.push(where('label', '==', data.label))
+      }
+      if(data.timestamp){
+        queries.push(orderBy('timestamp', data.timestamp[0].value))
+      }
+
+      let res = await fetchFilter(queries)
+      console.log(res)
+
+      mutate(res, false)
+
+    }}
+    fields={[
+      {
+        id:"label",
+        type:"text",
+        placeholder:"Tên"
+      },
+      {
+        id:"timestamp",
+        type:"select",
+        placeholder:"Ngày thêm",
+        props:{
+          labelKey:"label",
+          valueKey:"value"
+        },
+        options: [
+          {
+            label:"mới nhất",
+            value: 'desc',
+          },
+          {
+            label:"cũ nhất",
+            value: 'asc',
+          }
+        ]
+      },
+
+    ]}/>
 
     <StatefulTable
       title="Sản phẩm"
