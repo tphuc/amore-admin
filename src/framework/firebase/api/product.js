@@ -3,13 +3,13 @@
 import useSWR from 'swr'
 
 import { firestore } from '..'
-import { doc, addDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, setDoc, where, orderBy } from '@firebase/firestore'
+import { doc, addDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, query, setDoc, where, orderBy, limit } from '@firebase/firestore'
 import React from 'react'
 
 const ENDPOINT = 'products'
 
 const fetcher = async (ENDPOINT) => {
-    let res = await getDocs(collection(firestore, ENDPOINT), orderBy('timestamp', 'desc'))
+    let res = await getDocs(collection(firestore, ENDPOINT), orderBy('timestamp', 'desc'), limit(10))
     return res.docs.map(doc => ({ 
         id: doc.id,
         ...doc.data() 

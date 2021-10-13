@@ -18,10 +18,11 @@ export default function Login() {
     const login = async () => {
         try{
            
-            let res = await signInWithEmailAndPassword(auth, email, password)
-            console.log(res)
             let a = await setPersistence(auth, browserLocalPersistence)
             console.log(a)
+            let res = await signInWithEmailAndPassword(auth, email, password)
+            console.log(res)
+            
                if(res.user){
            history.push('/dashboard')
        }

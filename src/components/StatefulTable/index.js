@@ -16,7 +16,7 @@ import { Tag } from 'baseui/tag'
 
 
 const CellWrap = (props) => {
-  return <div style={{display:"flex", flexDirection:"row", flexWrap:"wrap"}}>
+  return <div style={{display:"flex", flexDirection:"row", flexWrap:"wrap", width:"100%"}}>
     {props.children}
   </div>
 }
@@ -24,10 +24,12 @@ const CellWrap = (props) => {
 const CellTag = (props) => {
   const [_, theme] = useStyletron()
   return <Tag 
+  size='small'
   closeable={false}
   overrides={{
     Text: {
       style: () => ({
+        fontSize:12,
         color: theme.colors.mono800
       })
     }
@@ -155,7 +157,7 @@ const ActAdd = ({ fields = [], onConfirm = () => { }, ...props }) => {
 
 const ImagesList = ({ images = [] }) => {
   return <div>
-    {images.map(item => <Avatar
+    {images?.map(item => <Avatar
       size="scale1000"
       overrides={{
         Avatar: {
@@ -174,7 +176,7 @@ const ImagesList = ({ images = [] }) => {
             borderBottomLeftRadius: $theme.borders.radius100,
           }),
         },
-      }} src={item.name} />)}
+      }} src={item.url} />)}
   </div>
 }
 

@@ -1,7 +1,7 @@
 import { Block } from 'baseui/block';
 import React from 'react';
 import StatefulTable, { ActAdd, ActDelete, ActEdit, ImagesList } from '../../../components/StatefulTable';
-import useCategories, { CategoriesCRUD } from '../../../framework/firebase/api/categories';
+import useCategories, { CategoriesCRUD } from '../../../framework/supabase/categories';
 import {
   SnackbarProvider,
   useSnackbar,
@@ -14,8 +14,8 @@ import { CloudinaryAPI } from '../../../framework/cloudinary';
 
 export default function Category() {
 
-  const { data: categories, mutate } = useCategories();
-  console.log('categories', categories)
+  const { data:categories, mutate } = useCategories();
+
   
   const { enqueue } = useSnackbar()
 
@@ -25,20 +25,18 @@ export default function Category() {
       let files = data.images || []
 
       let { images, ...fields } = data;
-      let fileUrls = await CloudinaryAPI.uploadFiles(files)
-      console.log('add cate', {
-        images: fileUrls,
-        ...fields
-      })
-      let res = await CategoriesCRUD.create({
-        images: fileUrls,
-        ...fields
-      });
-      enqueue({
-        message: 'Thêm thành công!',
-      })
-      mutate()
-      return true
+      console.log(data)
+      // let fileUrls = await CloudinaryAPI.uploadFiles(files)
+      
+      // let res = await CategoriesCRUD.create({
+      //   images: fileUrls,
+      //   ...fields
+      // });
+      // enqueue({
+      //   message: 'Thêm thành công!',
+      // })
+      // mutate()
+      // return true
     }
     catch (e) {
       console.log(e)
@@ -49,9 +47,12 @@ export default function Category() {
   const onEdit = async (id, data) => {
     try {
       let files = data.images || []
+   
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
 
       let { images, ...fields } = data;
+      console.log(id, data)
+     
       let res = await CategoriesCRUD.update(id, {
         images: fileUrls,
         ...fields
@@ -105,12 +106,12 @@ export default function Category() {
             placeholder: 'hình ảnh minh họa',
             props: {
               creatable: true,
-              valueKey: 'name'
+              valueKey: 'name',
             },
           }
         ]} kind='primary' shape='pill' />}
       data={categories || []}
-      columns={['Tên', 'Ảnh minh họa', '-']}
+      columns={['Tên', 'Hình ảnh', '-']}
       mapRow={(item) => [
         item.label,
         <ImagesList images={item.images}/>,
@@ -131,7 +132,7 @@ export default function Category() {
                 creatable: true,
                 valueKey: 'name'
               },
-              defaultValue: item.images
+              defaultValue: item.images || []
             }
           ]} onConfirm={(data) => onEdit(item.id, data)} />
         </>

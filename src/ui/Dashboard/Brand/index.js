@@ -4,7 +4,7 @@ import StatefulTable, { ActAdd, ActDelete, ActEdit, ImagesList } from '../../../
 import {
   useSnackbar,
 } from 'baseui/snackbar';
-import useBrands, { BrandsCRUD } from '../../../framework/firebase/api/brands';
+import useBrands, { BrandsCRUD } from '../../../framework/supabase/brands';
 import { CloudinaryAPI } from '../../../framework/cloudinary';
 
 

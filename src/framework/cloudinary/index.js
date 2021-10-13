@@ -1,12 +1,10 @@
 import axios from "axios";
 
-const baseUrl = "https://api.cloudinary.com/v1_1/minnuochoa-com/image/upload"
+const baseUrl = process.env.REACT_APP_CLOUDINARY_URL
 
 
 const CloudinaryAPI = {
   uploadFiles: async (files) => {
-
-
     const form = new FormData();
     return Promise.all(files.map(async file => {
 
@@ -18,14 +16,11 @@ const CloudinaryAPI = {
         form.append("file", file);
         form.append("upload_preset", "y1rasrxf");
 
-        let res = await axios.post(baseUrl, form)
+        let res = await axios.post(baseUrl + '/upload', form)
 
-        return { name: res.data.url}
+        return { url: res.data.url, id: res.data.asset_id }
       }
-
-
     }))
-
   }
 
 }

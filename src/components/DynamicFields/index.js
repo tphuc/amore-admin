@@ -13,7 +13,7 @@ const getImageLabel = ({ option }) => {
     return option && (
         <>
             <img alt={''} width='auto' height='200px' style={{objectFit:"scale-down", objectPosition:"center"}} 
-            src={ option instanceof File ? URL.createObjectURL(option) : option.name } 
+            src={ option instanceof File ? URL.createObjectURL(option) : option.url } 
             />
         </>
     );
