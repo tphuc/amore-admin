@@ -219,7 +219,7 @@ export default function Product() {
           }
         ]} kind='primary' shape='pill' />}
       data={products || []}
-      columns={['Ưu tiên', 'Tên',  'Giới tính', 'Phong cách', 'Nhãn hiệu', 'Danh mục', 'Lựa chọn',  'Hình ảnh', '_']}
+      columns={['Ưu tiên', 'Tên',   'Phong cách', 'Nhãn hiệu', 'Danh mục', 'Lựa chọn',  'Hình ảnh', '_']}
       mapRow={(item) => [
         <div style={{display:"flex", flexDirection:"row",alignItems:"center"}}>
         <span>{item.arrange}</span>
@@ -228,7 +228,6 @@ export default function Product() {
         </div>
         ,
         item.label,
-        item.gender,
         item.style,
         item.brand.label,
         item.categories?.map(item => item.label).join(','),

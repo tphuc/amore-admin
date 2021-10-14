@@ -10,32 +10,34 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 const collection = 'products'
 const _data = require(`../${collection}.json`);
-const data = _data.map(item => {
-    const {id,  ...fields} = item;
-    return {
-        label: fields.label,
-        low_price: fields.price,
-        variants: fields.variants,
-        origin: fields.origin?.map(item => item.label).join(','),
-        style:  fields.style?.map(item => item.label).join(','),
-        introduction: fields.introduction,
-        gender: fields.gender?.map(item => item.label).join(','),
-        images: fields.images.map(item => ({ url: item.name })),
-        temp: Object.values(fields.brands)[0].label
-    }
-})
+// const data = _data.map(item => {
+//     const {id,  ...fields} = item;
+//     return {
+//         ...fields
+//     }
+// })
 
 
-console.log(data)
+
 
 async function execute(name){
 
-    let res = await supabase.from('categories').select('id').match()
+    // let products = await (await supabase.from('products').select('*')).data
+    // let categories = await (await supabase.from('categories').select('*')).data
+    // for(let product of products){
+    //     let product_cates = product.temp
+        
+    //     let cate_res = await supabase.from('product_category').insert(product_cates.map(item => ({
+    //         product_id: product.id,
+    //         category_id: categories.find(c => c.label === item.label).id
+    //     })))
+    // }
+    // let res = await supabase.from('categories').select('id').match()
 
     // let res = await supabase.from(name).insert(data)
     // console.log(res)
 }
 
 
-// execute('products')
+execute('products')
 

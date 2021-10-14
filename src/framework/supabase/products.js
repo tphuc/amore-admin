@@ -9,7 +9,6 @@ const ENDPOINT = 'products'
 
 
 const fetcher = async (ENDPOINT, filter) => {
-    console.log(filter)
     let res = await supabase.from(ENDPOINT)
     .select(`*, 
         brand: brands(
@@ -19,7 +18,7 @@ const fetcher = async (ENDPOINT, filter) => {
             *
         )
     `)
-    .like('label', `%${filter.label}%`)
+    .like('label', `%${filter.label || ''}%`)
 
     return res.data
    
