@@ -222,16 +222,16 @@ export default function Product() {
       columns={['Ưu tiên', 'Tên',   'Phong cách', 'Nhãn hiệu', 'Danh mục', 'Lựa chọn',  'Hình ảnh', '_']}
       mapRow={(item) => [
         <div style={{display:"flex", flexDirection:"row",alignItems:"center"}}>
-        <span>{item.arrange}</span>
-        <ActCustom header='Lên trang chính' onClick={() => editCustom(item.id, { arrange: item?.arrange + 1})} icon={<AiOutlinePlus/>}/>
-        <ActCustom header='Lên trang chính' onClick={() => editCustom(item.id, { arrange: item?.arrange - 1})} icon={<AiOutlineMinus/>}/>
+          <span>{item.arrange}</span>
+          <ActCustom header='Lên trang chính' onClick={() => editCustom(item.id, { arrange: item?.arrange + 1})} icon={<AiOutlinePlus/>}/>
+          <ActCustom header='Lên trang chính' onClick={() => editCustom(item.id, { arrange: item?.arrange - 1})} icon={<AiOutlineMinus/>}/>
         </div>
         ,
         item.label,
         item.style,
-        item.brand.label,
+        item.brand?.label,
         item.categories?.map(item => item.label).join(','),
-        <CellWrap>{item.variants.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
+        <CellWrap>{item.variants?.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
         <ImagesList images={item.images} />,
         <>
           <ActDelete onConfirm={() => onDelete(item)} />
