@@ -1,5 +1,5 @@
 import { Block } from 'baseui/block';
-import React from 'react';
+import React, { useState } from 'react';
 import StatefulTable, { ActAdd, ActConfirm, ActDelete, ActEdit, ImagesList } from '../../../components/StatefulTable';
 import {
   useSnackbar,
@@ -10,48 +10,22 @@ import useProducts, { ProductsCRUD } from '../../../framework/firebase/api/produ
 import { CloudinaryAPI } from '../../../framework/cloudinary';
 import { Tag } from "baseui/tag";
 import { formatNumber, urlToFile } from '../../../util';
-import useOrders, { OrdersCRUD } from '../../../framework/firebase/api/order';
+import useOrders, { OrderCRUD } from '../../../framework/supabase/order';
 import { Checkbox } from 'baseui/checkbox'
+import SearchBar from '../../../components/SearchBar';
 
 export default function Order() {
 
-  const { data: orders, mutate } = useOrders();
+  const [filter, setFilter] = useState({});
+  const { data: orders, mutate } = useOrders(filter);
   console.log(orders)
   const { enqueue } = useSnackbar()
 
-  const onAdd = async (data) => {
-    try {
-      let files = data.images
-      let fileUrls = await CloudinaryAPI.uploadFiles(files)
-      let { images, ...fields } = data;
-      let res = await ProductsCRUD.create({
-        images: fileUrls,
-        ...fields
-      });
 
-      enqueue({
-        message: 'Thêm thành công!',
-      })
-      mutate()
-      return true
-    }
-    catch (e) {
-      console.log(e)
-    }
-
-  }
 
   const onEdit = async (id, data) => {
     try {
-      let files = data.images
-      console.log(files)
-      let fileUrls = await CloudinaryAPI.uploadFiles(files)
-
-      let { images, ...fields } = data;
-      let res = await ProductsCRUD.update(id, {
-        images: fileUrls,
-        ...fields
-      });
+      let res = await OrderCRUD.update(id, data)
       enqueue({
         message: 'Sửa thành công!',
       })
@@ -67,7 +41,7 @@ export default function Order() {
 
   const onDelete = async (item) => {
     try {
-      let res = await OrdersCRUD.delete(item.id);
+      let res = await OrderCRUD.delete(item.id);
       enqueue({
         message: 'Xóa thành công!',
       })
@@ -81,25 +55,91 @@ export default function Order() {
 
   return <Block>
 
+    <SearchBar
+      onSearch={async (data) => {
+
+        setFilter(data)
+        // mutate(res, false)
+
+      }}
+      fields={[
+        {
+          id: "name",
+          type: "text",
+          placeholder: "Tên",
+          defaultValue: ''
+        },
+        {
+          id: "phone",
+          type: "text",
+          placeholder: "SDT",
+          defaultValue: ''
+        },
+        {
+          id: "paid",
+          type: "select",
+          placeholder: "Thanh toán",
+          options: [{
+            label: "Đã thanh toán",
+            value: true,
+          },
+          {
+            label: "Chưa thanh toán",
+            value: false
+          }],
+          defaultValue: '',
+          props: {
+            labelKey:"label",
+            valueKey:"value"
+          }
+        },
+        {
+          id: "paymentMethod",
+          type: "select",
+          placeholder: "Phương thức thanh toán",
+          options: [{
+            label: "chuyển khoản",
+            value: 'transfer',
+          },
+          {
+            label: "tiền mặt",
+            value: 'cash'
+          }],
+          defaultValue: '',
+          props: {
+            labelKey:"label",
+            valueKey:"value"
+          }
+        }
+
+
+      ]} />
     <StatefulTable
       title="Đơn đặt"
       actionText={null}
       data={orders || []}
-      columns={['Thông tin người đặt',  'Phương thức', 'Ngày đặt', 'Đã thanh toán', 'Tổng', '_']}
+      columns={['Thông tin người đặt', 'Phương thức', 'Ngày đặt', 'Đơn hàng', 'Đã thanh toán', 'Tổng', '_']}
       mapRow={(item) => [
         <div>
-        <span>{item.name}</span><br/>
-        <span>{item.phone}</span><br/>
-        <span>{item.address}</span>
+          <span>Tên: {item.name}</span><br />
+          <span>SĐT: {item.phone}</span><br />
+          <span>Địa chỉ: {item.address}</span>
         </div>,
-        
+
         <p>{item.paymentMethod === 'cash' ? 'Tiền mặt' : 'Chuyển khoản'}</p>,
-        <p>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</p>,
-        <Checkbox checked={item.paid}></Checkbox>,
+        <p>{new Date(item.created_at).toLocaleString()}</p>,
+        <div>
+          {item.cart?.map(item => <div style={{ display: "flex", flexDirection: "row" }}>
+            <img alt='-' src={item?.images[0]?.url} style={{ width: 30, height: 30 }} />
+            <div>{item.label} {item.variant.label}</div>
+          </div>)}
+        </div>,
+        <Checkbox  checked={item.paid}></Checkbox>,
+
         <p>{formatNumber(item.total)}</p>,
         <>
           <ActDelete onConfirm={() => onDelete(item)} />
-          <ActConfirm header='Xác nhận đã thanh toán' onConfirm={(data) => onEdit(item.id, data)} />
+          <ActConfirm header='Xác nhận đã thanh toán' onConfirm={(data) => onEdit(item.id, {paid: true})} />
         </>
       ]}
     />
