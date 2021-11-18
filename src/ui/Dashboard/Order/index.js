@@ -42,6 +42,7 @@ export default function Order() {
   const onDelete = async (item) => {
     try {
       let res = await OrderCRUD.delete(item.id);
+      console.log(45, res)
       enqueue({
         message: 'Xóa thành công!',
       })

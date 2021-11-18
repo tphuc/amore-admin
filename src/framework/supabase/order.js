@@ -63,6 +63,7 @@ export const OrderCRUD = {
         return res
     },
     delete: async (id) => {
-
+        let res = await supabase.from(ENDPOINT).delete().match({id})
+        return res
     },
 }
