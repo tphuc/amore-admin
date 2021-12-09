@@ -1,19 +1,18 @@
 import { Block } from 'baseui/block';
-import React from 'react';
+import React, { useState } from 'react';
 import StatefulTable, { ActAdd, ActCustom, ActDelete, ActEdit, CellTag, CellWrap, ImagesList } from '../../../components/StatefulTable';
 import {
   useSnackbar,
 } from 'baseui/snackbar';
 
-import useProducts, { ProductsCRUD } from '../../../framework/firebase/api/product';
-
+import useProducts, { ProductsCRUD } from '../../../framework/supabase/products';
+import useBrands from '../../../framework/supabase/brands';
+import useCategories from '../../../framework/supabase/categories';
 import { CloudinaryAPI } from '../../../framework/cloudinary';
 import { Tag } from "baseui/tag";
 import { parseLabelPrice, toArray, toObject, urlToFile } from '../../../util';
-import useBrands from '../../../framework/firebase/api/brands';
-import useCategories from '../../../framework/firebase/api/categories';
 import { serverTimestamp } from '../../../framework/firebase';
-import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
+import { AiFillMinusCircle, AiFillPlusCircle, AiFillStar, AiOutlineMinus, AiOutlinePlus, AiOutlineStar, AiTwotonePlusCircle } from 'react-icons/ai';
 import { useStyletron } from 'baseui';
 import SearchBar from '../../../components/SearchBar';
 import { where, orderBy } from 'firebase/firestore';
@@ -21,34 +20,26 @@ import { where, orderBy } from 'firebase/firestore';
 export default function Product() {
 
   const [css, theme] = useStyletron()
-  const { data: products, mutate, fetchFilter } = useProducts();
+  
   const { data: brands} = useBrands();
   const { data: categories} = useCategories();
   const { enqueue } = useSnackbar()
+  const [filter, setFilter] = useState({})
+  const { data: products, mutate, } = useProducts(filter);
+
 
   const onAdd = async (data) => {
     try {
 
-      let files = data.images
-      
+      let files = data.images || []
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
-      let { images, brands, categories, ...fields } = data;
-      console.log({
-        images: fileUrls,
-        ...fields,
-        brands: toObject(brands),
-        categories: toObject(categories),
-        price: parseLabelPrice(fields.variants[0].label).price,
-        timestamp: serverTimestamp()
-      })
+      let { images, brands,  ...fields } = data;
+
       let res = await ProductsCRUD.create({
-        images: fileUrls,
         ...fields,
-        brands: toObject(brands),
-        categories: toObject(categories),
-        price: parseLabelPrice(fields.variants[0].label).price,
-        timestamp: serverTimestamp()
-      })
+        images: fileUrls,
+        brand: brands[0]?.id || null,
+      });
 
       enqueue({
         message: 'Thêm thành công!',
@@ -57,26 +48,20 @@ export default function Product() {
       return true
     }
     catch (e) {
-      console.log(e)
+
     }
 
   }
 
   const onEdit = async (id, data) => {
     try {
-      console.log(58, data)
       let files = data.images
-      
       let fileUrls = await CloudinaryAPI.uploadFiles(files)
-
-      let { images, brands, categories, ...fields } = data;
-
+      let { images, brands,  ...fields } = data;
       let res = await ProductsCRUD.update(id, {
-        images: fileUrls,
         ...fields,
-        brands: toObject(brands),
-        categories: toObject(categories),
-       
+        images: fileUrls,
+        brand: brands[0]?.id || null,
       });
       enqueue({
         message: 'Sửa thành công!',
@@ -92,11 +77,26 @@ export default function Product() {
   }
 
   const editProductHighlight = async (id, data) => {
-    console.log(data)
     try {
       let res = await ProductsCRUD.update(id, {
-          hightlight: data
+          starred: data
       });
+      enqueue({
+        message: 'Sửa thành công!',
+      })
+      mutate()
+      return true
+    }
+    catch (e) {
+      console.log(e)
+    }
+
+
+  }
+
+  const editCustom = async (id, data) => {
+    try {
+      let res = await ProductsCRUD.update(id, data);
       enqueue({
         message: 'Sửa thành công!',
       })
@@ -113,6 +113,7 @@ export default function Product() {
   const onDelete = async (item) => {
     try {
       let res = await ProductsCRUD.delete(item.id);
+
       enqueue({
         message: 'Xóa thành công!',
       })
@@ -128,44 +129,19 @@ export default function Product() {
     <SearchBar 
     onSearch={async (data) => {
       let queries = [];
-      if(data.label){
-        queries.push(where('label', '==', data.label))
-      }
-      if(data.timestamp){
-        queries.push(orderBy('timestamp', data.timestamp[0].value))
-      }
+      setFilter(data);
 
-      let res = await fetchFilter(queries)
-      console.log(res)
-
-      mutate(res, false)
+      // mutate(res, false)
 
     }}
     fields={[
       {
         id:"label",
         type:"text",
-        placeholder:"Tên"
+        placeholder:"Tên",
+        defaultValue: ''
       },
-      {
-        id:"timestamp",
-        type:"select",
-        placeholder:"Ngày thêm",
-        props:{
-          labelKey:"label",
-          valueKey:"value"
-        },
-        options: [
-          {
-            label:"mới nhất",
-            value: 'desc',
-          },
-          {
-            label:"cũ nhất",
-            value: 'asc',
-          }
-        ]
-      },
+
 
     ]}/>
 
@@ -181,33 +157,18 @@ export default function Product() {
           },
           {
             id: "origin",
-            type: "select",
+            type: "text",
             placeholder: 'xuất xứ',
-            props: {
-              creatable: true,
-              labelKey: "label",
-              valueKey: "value"
-            }
           },
           {
             id: "gender",
-            type: "select-multiple",
+            type: "text",
             placeholder: 'giới tính',
-            props: {
-              creatable: true,
-              labelKey: "label",
-              valueKey: "value"
-            }
           },
           {
             id: "style",
-            type: "select-multiple",
+            type: "text",
             placeholder: 'phong cách',
-            props: {
-              creatable: true,
-              labelKey: "label",
-              valueKey: "value"
-            },
           },
           {
             id: "brands",
@@ -258,15 +219,19 @@ export default function Product() {
           }
         ]} kind='primary' shape='pill' />}
       data={products || []}
-      columns={['Tên', 'Xuất xứ', 'Giới tính', 'Phong cách', 'Nhãn hiệu', 'Danh mục', 'Lựa chọn',  'Hình ảnh', '_']}
+      columns={['Ưu tiên', 'Tên',   'Phong cách', 'Nhãn hiệu', 'Danh mục', 'Lựa chọn',  'Hình ảnh', '_']}
       mapRow={(item) => [
+        <div style={{display:"flex", flexDirection:"row",alignItems:"center"}}>
+          <span>{item.arrange}</span>
+          <ActCustom header='Lên trang chính' onClick={() => editCustom(item.id, { arrange: item?.arrange + 1})} icon={<AiOutlinePlus/>}/>
+          <ActCustom header='Lên trang chính' onClick={() => editCustom(item.id, { arrange: item?.arrange - 1})} icon={<AiOutlineMinus/>}/>
+        </div>
+        ,
         item.label,
-        <CellWrap>{item.origin.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{item.gender.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{item.style.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{toArray(item.brands).map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{toArray(item.categories).map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
-        <CellWrap>{item.variants.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
+        item.style,
+        item.brand?.label,
+        item.categories?.map(item => item.label).join(','),
+        <CellWrap>{item.variants?.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
         <ImagesList images={item.images} />,
         <>
           <ActDelete onConfirm={() => onDelete(item)} />
@@ -279,29 +244,20 @@ export default function Product() {
             },
             {
               id: "origin",
-              type: "select",
+              type: "text",
               placeholder: 'xuất xứ',
-              props: {
-                creatable: true
-              },
               defaultValue: item['origin']
             },
             {
               id: "gender",
-              type: "select-multiple",
+              type: "text",
               placeholder: 'giới tính',
-              props: {
-                creatable: true
-              },
               defaultValue: item['gender']
             },
             {
               id: "style",
-              type: "select-multiple",
+              type: "text",
               placeholder: 'phong cách',
-              props: {
-                creatable: true
-              },
               defaultValue: item['style']
             },
             {
@@ -314,7 +270,7 @@ export default function Product() {
                 labelKey: "label",
                 valueKey: "id"
               },
-              defaultValue: toArray(item['brands'])
+              defaultValue: [item['brand']]
             },
             {
               id: "categories",
@@ -326,7 +282,7 @@ export default function Product() {
                 labelKey: "label",
                 valueKey: "id"
               },
-              defaultValue: toArray(item['categories'])
+              defaultValue: item.categories,
             },
             {
               id: "variants",
@@ -357,7 +313,8 @@ export default function Product() {
               defaultValue: item['introduction'] || ''
             }
           ]} onConfirm={(data) => onEdit(item.id, data)} />
-          <ActCustom header='Lên trang chính' onClick={() => editProductHighlight(item.id, !item?.hightlight)} icon={<AiFillStar color={item?.hightlight ? theme.colors.accent500 : theme.colors.mono500}/>}/>
+          <ActCustom header='Lên trang chính' onClick={() => editProductHighlight(item.id, !item?.starred)} icon={<AiFillStar color={item?.starred ? theme.colors.accent500 : theme.colors.mono500}/>}/>
+
         </>
       ]}
     />

@@ -1,0 +1,52 @@
+[
+    {
+        "id": "Tyy02utBGNJr4VoUJ4K2",
+        "label": "GIFT-SET",
+        "images": [
+            {
+                "name": "http://res.cloudinary.com/minnuochoa-com/image/upload/v1633851402/ayz4goc3xrvppdasdrxz.png"
+            }
+        ],
+        "order": 4
+    },
+    {
+        "id": "WY6pILhz1Vaul6lnCzak",
+        "label": "NƯỚC HOA NỮ",
+        "order": 2,
+        "images": [
+            {
+                "name": "http://res.cloudinary.com/minnuochoa-com/image/upload/v1633851409/xqspz8ovdpxteenjx1bz.png"
+            }
+        ]
+    },
+    {
+        "id": "beZJcEH5nH4uW9tpt2Fd",
+        "images": [
+            {
+                "name": "http://res.cloudinary.com/minnuochoa-com/image/upload/v1633851416/ifpd9fuhlwoaxrktq5zw.png"
+            }
+        ],
+        "order": 5,
+        "label": "LĂN KHỬ MÙI"
+    },
+    {
+        "id": "l1CcWCZNABIvsM7JzMAJ",
+        "images": [
+            {
+                "name": "http://res.cloudinary.com/minnuochoa-com/image/upload/v1633851423/grm1yharjdtcpv9chasg.png"
+            }
+        ],
+        "label": "NƯỚC HOA MINI",
+        "order": 3
+    },
+    {
+        "id": "yiQcm6sgm19ANygrXRuK",
+        "images": [
+            {
+                "name": "http://res.cloudinary.com/minnuochoa-com/image/upload/v1633851429/icivvmk3gcpmcthbbjpk.png"
+            }
+        ],
+        "order": 1,
+        "label": "NƯỚC HOA NAM"
+    }
+]
