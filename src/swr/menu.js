@@ -1,7 +1,7 @@
 
 
 import useSWR from 'swr'
-import {AiOutlineAppstore, AiOutlineCrown, AiOutlineContainer, AiOutlineDatabase} from 'react-icons/ai'
+import {AiOutlineAppstore, AiOutlineCrown, AiOutlineContainer, AiOutlineDatabase, AiOutlineUser} from 'react-icons/ai'
 
 const fetcher = (...args) => {
     return Promise.resolve([
@@ -28,6 +28,7 @@ const fetcher = (...args) => {
             path: '/orders'
         },
         {
+            icon: AiOutlineUser,
             name: "Người dùng",
             path: '/user'
         },

@@ -2,9 +2,8 @@ import React from 'react';
 import { Block } from 'baseui/block'
 import { Input } from 'baseui/input'
 import { Button } from 'baseui/button';
-import {  signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from 'firebase/auth'
-import { auth } from '../../framework/firebase';
 import { useHistory } from 'react-router';
+import { supabase } from '../../framework/supabase';
 
 
 export default function Login() {
@@ -18,13 +17,12 @@ export default function Login() {
     const login = async () => {
         try{
            
-            let a = await setPersistence(auth, browserLocalPersistence)
-            console.log(a)
-            let res = await signInWithEmailAndPassword(auth, email, password)
-            console.log(res)
+
+            let res = await supabase.auth.signIn({email, password})
+
             
-               if(res.user){
-           history.push('/dashboard')
+            if(res.user){
+            history.push('/dashboard')
        }
         }
         catch(e){
@@ -36,7 +34,7 @@ export default function Login() {
     }
 
     return <Block width='100vw' height='100vh' display='flex' flexDirection='column' justifyContent='center' alignItems='center'>
-        <h1>Admin Minperfume</h1>
+        <h1>Admin Amore shop</h1>
         <Block width='500px' display='flex' flexDirection='column'>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder='email' ></Input>
 

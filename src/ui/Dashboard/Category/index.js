@@ -8,6 +8,7 @@ import {
   DURATION,
 } from 'baseui/snackbar';
 import { CloudinaryAPI } from '../../../framework/cloudinary';
+import { supabase } from '../../../framework/supabase';
 
 
 
@@ -22,21 +23,17 @@ export default function Category() {
   const onAdd = async (data) => {
 
     try {
-      let files = data.images || []
 
-      let { images, ...fields } = data;
-      console.log(data)
-      // let fileUrls = await CloudinaryAPI.uploadFiles(files)
+
+      let res = await CategoriesCRUD.create({
+        ...data
+      });
+
+      if(!res.error){
+        mutate()
+        return true
+      }
       
-      // let res = await CategoriesCRUD.create({
-      //   images: fileUrls,
-      //   ...fields
-      // });
-      // enqueue({
-      //   message: 'Thêm thành công!',
-      // })
-      // mutate()
-      // return true
     }
     catch (e) {
       console.log(e)
@@ -45,27 +42,18 @@ export default function Category() {
   }
 
   const onEdit = async (id, data) => {
-    try {
-      let files = data.images || []
-   
-      let fileUrls = await CloudinaryAPI.uploadFiles(files)
-
-      let { images, ...fields } = data;
-      console.log(id, data)
-     
+    try {     
       let res = await CategoriesCRUD.update(id, {
-        images: fileUrls,
-        ...fields
+        ...data
       });
-      console.log({
-        images: fileUrls,
-        ...fields
-      })
-      enqueue({
-        message: 'Sửa thành công!',
-      })
-      mutate()
-      return true
+      if(!res.error){
+        enqueue({
+          message: 'Sửa thành công!',
+        })
+        mutate()
+        return true
+      }
+
     }
     catch (e) {
       console.log(e)
@@ -77,11 +65,14 @@ export default function Category() {
   const onDelete = async (item) => {
     try {
       let res = await CategoriesCRUD.delete(item.id);
-      enqueue({
-        message: 'Xóa thành công!',
-      })
-      mutate()
-      return true
+      if(!res.error){
+        enqueue({
+          message: 'Xóa thành công!',
+        })
+        mutate()
+        return true
+      }
+      
     }
     catch (e) {
       console.log(e)
@@ -100,18 +91,9 @@ export default function Category() {
             type: "text",
             placeholder: 'Tên danh mục'
           },
-          {
-            id: "images",
-            type: "file",
-            placeholder: 'hình ảnh minh họa',
-            props: {
-              creatable: true,
-              valueKey: 'name',
-            },
-          }
         ]} kind='primary' shape='pill' />}
       data={categories || []}
-      columns={['Tên', 'Hình ảnh', '-']}
+      columns={['Tên', '-']}
       mapRow={(item) => [
         item.label,
         <ImagesList images={item.images}/>,
@@ -124,16 +106,6 @@ export default function Category() {
               placeholder: 'Tên danh mục',
               defaultValue: item['label']
             },
-            {
-              id: "images",
-              type: "file",
-              placeholder: 'hình ảnh',
-              props: {
-                creatable: true,
-                valueKey: 'name'
-              },
-              defaultValue: item.images || []
-            }
           ]} onConfirm={(data) => onEdit(item.id, data)} />
         </>
       ]}

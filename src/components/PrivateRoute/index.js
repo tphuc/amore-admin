@@ -4,16 +4,18 @@ import {
   Route,
   Redirect,
 } from 'react-router-dom';
-import { auth } from '../../framework/firebase';
+
+import { supabase } from '../../framework/supabase';
 
 
 
 function PrivateRoute({ component: Component, ...others }) {
-    console.log('private route', auth.app, auth.currentUser)
-  return (
+  const session = supabase.auth.session();
+  const isExpired = session?.expires_at - (new Date().getTime() / 1000)  < 0
+  return ( 
     <Route
       {...others}
-      render={props => (auth.currentUser ? (
+      render={props => (session && !isExpired  ? (
         <Component {...props} />
       ) : (
         <Redirect

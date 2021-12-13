@@ -16,13 +16,15 @@ import { AiFillMinusCircle, AiFillPlusCircle, AiFillStar, AiOutlineMinus, AiOutl
 import { useStyletron } from 'baseui';
 import SearchBar from '../../../components/SearchBar';
 import { where, orderBy } from 'firebase/firestore';
+import { Button } from 'baseui/button';
+import { Plus } from 'baseui/icon';
 
 export default function Product() {
 
   const [css, theme] = useStyletron()
-  
-  const { data: brands} = useBrands();
-  const { data: categories} = useCategories();
+
+  const { data: brands } = useBrands();
+  const { data: categories } = useCategories();
   const { enqueue } = useSnackbar()
   const [filter, setFilter] = useState({})
   const { data: products, mutate, } = useProducts(filter);
@@ -31,84 +33,50 @@ export default function Product() {
   const onAdd = async (data) => {
     try {
 
-      let files = data.images || []
-      let fileUrls = await CloudinaryAPI.uploadFiles(files)
-      let { images, brands,  ...fields } = data;
+      let { brands, ...fields } = data;
 
       let res = await ProductsCRUD.create({
         ...fields,
-        images: fileUrls,
-        brand: brands[0]?.id || null,
+        brand: brands?.length ? brands[0]?.id : null,
       });
+      console.log(res)
+      if (!res.error) {
+        enqueue({
+          message: 'Thêm thành công!',
+        })
+        mutate()
+        return true
+      }
 
-      enqueue({
-        message: 'Thêm thành công!',
-      })
-      mutate()
-      return true
     }
     catch (e) {
-
+      console.log(e)
     }
 
   }
 
   const onEdit = async (id, data) => {
     try {
-      let files = data.images
-      let fileUrls = await CloudinaryAPI.uploadFiles(files)
-      let { images, brands,  ...fields } = data;
+
+      let { brands, ...fields } = data;
       let res = await ProductsCRUD.update(id, {
         ...fields,
-        images: fileUrls,
-        brand: brands[0]?.id || null,
+        brand: brands?.length ? brands[0]?.id : null,
       });
-      enqueue({
-        message: 'Sửa thành công!',
-      })
-      mutate()
-      return true
+      if (!res.error) {
+        enqueue({
+          message: 'Sửa thành công!',
+        })
+        mutate()
+        return true
+      }
     }
     catch (e) {
       console.log(e)
     }
-
-
   }
 
-  const editProductHighlight = async (id, data) => {
-    try {
-      let res = await ProductsCRUD.update(id, {
-          starred: data
-      });
-      enqueue({
-        message: 'Sửa thành công!',
-      })
-      mutate()
-      return true
-    }
-    catch (e) {
-      console.log(e)
-    }
 
-
-  }
-
-  const editCustom = async (id, data) => {
-    try {
-      let res = await ProductsCRUD.update(id, data);
-      enqueue({
-        message: 'Sửa thành công!',
-      })
-      mutate()
-      return true
-    }
-    catch (e) {
-      console.log(e)
-    }
-
-
-  }
 
   const onDelete = async (item) => {
     try {
@@ -126,28 +94,27 @@ export default function Product() {
   }
 
   return <Block>
-    <SearchBar 
-    onSearch={async (data) => {
-      let queries = [];
-      setFilter(data);
-
-      // mutate(res, false)
-
-    }}
-    fields={[
-      {
-        id:"label",
-        type:"text",
-        placeholder:"Tên",
-        defaultValue: ''
-      },
+    <SearchBar
+      onSearch={async (data) => {
+        let queries = [];
+        setFilter(data);
+      }}
+      fields={[
+        {
+          id: "label",
+          type: "text",
+          placeholder: "Tên",
+          defaultValue: ''
+        },
 
 
-    ]}/>
+      ]} />
 
     <StatefulTable
       title="Sản phẩm"
-      actionText={<ActAdd
+      actionText={<ActCustom
+      icon={<Plus/>}
+      header={'Thêm sản phẩm'}
         onConfirm={onAdd}
         fields={[
           {
@@ -155,21 +122,7 @@ export default function Product() {
             type: "text",
             placeholder: 'Tên sản phẩm'
           },
-          {
-            id: "origin",
-            type: "text",
-            placeholder: 'xuất xứ',
-          },
-          {
-            id: "gender",
-            type: "text",
-            placeholder: 'giới tính',
-          },
-          {
-            id: "style",
-            type: "text",
-            placeholder: 'phong cách',
-          },
+
           {
             id: "brands",
             type: "select",
@@ -187,7 +140,6 @@ export default function Product() {
             placeholder: 'thuộc danh mục',
             options: categories,
             props: {
-              creatable: true,
               labelKey: "label",
               valueKey: "id"
             },
@@ -195,7 +147,7 @@ export default function Product() {
           {
             id: "variants",
             type: "select-multiple",
-            placeholder: 'lựa chọn (dung tích-giá tiền)',
+            placeholder: 'sizes',
             props: {
               creatable: true,
               labelKey: "label",
@@ -213,22 +165,22 @@ export default function Product() {
             },
           },
           {
-            id: "introduction",
+            id: "price",
+            placeholder: "price",
+            type: "text",
+            defaultValue: ''
+          },
+          {
+            id: "description",
             type: "richtext",
             defaultValue: ''
-          }
+          },
+
         ]} kind='primary' shape='pill' />}
       data={products || []}
-      columns={['Ưu tiên', 'Tên',   'Phong cách', 'Nhãn hiệu', 'Danh mục', 'Lựa chọn',  'Hình ảnh', '_']}
+      columns={['Tên', 'Nhãn hiệu', 'Danh mục', 'Lựa chọn', 'Hình ảnh', '_']}
       mapRow={(item) => [
-        <div style={{display:"flex", flexDirection:"row",alignItems:"center"}}>
-          <span>{item.arrange}</span>
-          <ActCustom header='Lên trang chính' onClick={() => editCustom(item.id, { arrange: item?.arrange + 1})} icon={<AiOutlinePlus/>}/>
-          <ActCustom header='Lên trang chính' onClick={() => editCustom(item.id, { arrange: item?.arrange - 1})} icon={<AiOutlineMinus/>}/>
-        </div>
-        ,
         item.label,
-        item.style,
         item.brand?.label,
         item.categories?.map(item => item.label).join(','),
         <CellWrap>{item.variants?.map(item => <CellTag closeable={false}>{item.label}</CellTag>)}</CellWrap>,
@@ -243,24 +195,6 @@ export default function Product() {
               defaultValue: item['label']
             },
             {
-              id: "origin",
-              type: "text",
-              placeholder: 'xuất xứ',
-              defaultValue: item['origin']
-            },
-            {
-              id: "gender",
-              type: "text",
-              placeholder: 'giới tính',
-              defaultValue: item['gender']
-            },
-            {
-              id: "style",
-              type: "text",
-              placeholder: 'phong cách',
-              defaultValue: item['style']
-            },
-            {
               id: "brands",
               type: "select",
               placeholder: 'thuộc hãng',
@@ -270,7 +204,7 @@ export default function Product() {
                 labelKey: "label",
                 valueKey: "id"
               },
-              defaultValue: [item['brand']]
+              defaultValue: item.brand ? [item.brand] : null
             },
             {
               id: "categories",
@@ -287,14 +221,14 @@ export default function Product() {
             {
               id: "variants",
               type: "select-multiple",
-              placeholder: 'lựa chọn (dung tích-giá tiền)',
+              placeholder: 'variants',
               props: {
                 creatable: true,
                 labelKey: "label",
                 valueKey: "value"
               },
               defaultValue: item['variants']
-  
+
             },
             {
               id: "images",
@@ -308,12 +242,18 @@ export default function Product() {
               defaultValue: item.images
             },
             {
-              id: "introduction",
+              id: "price",
+              placeholder: "price",
+              type: "text",
+              defaultValue: item['price'] || ''
+            },
+            {
+              id: "description",
               type: "richtext",
-              defaultValue: item['introduction'] || ''
-            }
+              defaultValue: item['description'] || ''
+            },
+
           ]} onConfirm={(data) => onEdit(item.id, data)} />
-          <ActCustom header='Lên trang chính' onClick={() => editProductHighlight(item.id, !item?.starred)} icon={<AiFillStar color={item?.starred ? theme.colors.accent500 : theme.colors.mono500}/>}/>
 
         </>
       ]}
